@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "AnyUser Accessibility Standard",
+	"Description": "Universal accessibility profile parser and behavioral interceptors for Unreal Engine 5.",
+	"Category": "Accessibility",
+	"CreatedBy": "AnyUser.Net",
+	"CreatedByURL": "https://anyuser.net",
+	"DocsURL": "https://anyuser.net/docs",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/CwtchCode/anyuser-unreal",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AnyUser",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		}
+	]
+}
