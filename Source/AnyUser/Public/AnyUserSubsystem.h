@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Profile")
 	const FAnyUserProfile& GetActiveProfile() const { return CurrentProfile; }
 
-	// Quick Accessors
+	// Quick Accessors (Vision)
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision")
 	float GetUiScale() const { return CurrentProfile.vision.ui_scale; }
 
@@ -48,8 +48,30 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision")
 	bool IsHighContrastMode() const { return CurrentProfile.vision.high_contrast_mode; }
 
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision")
+	FString GetFontPreference() const { return CurrentProfile.vision.font_preference; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision")
+	bool IsFlashingAllowed() const { return CurrentProfile.vision.flashing_effects; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision|Subtitles")
+	bool IsSubtitlesEnabled() const { return CurrentProfile.vision.subtitles.enabled; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision|Subtitles")
+	FString GetSubtitleSize() const { return CurrentProfile.vision.subtitles.size; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision|Subtitles")
+	bool IsSubtitleSpeakerNames() const { return CurrentProfile.vision.subtitles.speaker_names; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Vision|Subtitles")
+	float GetSubtitleBackgroundOpacity() const { return CurrentProfile.vision.subtitles.background_opacity; }
+
+	// Quick Accessors (Motor)
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Motor")
 	bool IsToggleInsteadOfHold() const { return CurrentProfile.motor.toggle_instead_of_hold; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Motor")
+	bool IsQteAutoComplete() const { return CurrentProfile.motor.qte_auto_complete; }
 
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Motor")
 	float GetAimAssistStrength() const { return CurrentProfile.motor.aim_assist_strength; }
@@ -57,17 +79,28 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Motor")
 	int32 GetInputRepeatDelayMs() const { return CurrentProfile.motor.input_repeat_delay_ms; }
 
+	// Quick Accessors (Audio)
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Audio")
 	bool IsTinnitusCut() const { return CurrentProfile.audio.tinnitus_frequency_cut; }
 
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Audio")
+	bool IsMonoAudio() const { return CurrentProfile.audio.mono_audio; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Audio")
 	bool IsDialogueBoost() const { return CurrentProfile.audio.dialogue_boost; }
 
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Audio")
+	float GetBackgroundMusicDucking() const { return CurrentProfile.audio.background_music_ducking; }
+
+	// Quick Accessors (Cognitive)
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Cognitive")
 	bool IsReadingLevelSimplified() const { return CurrentProfile.cognitive.reading_level_simplified; }
 
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Cognitive")
 	bool IsDisableTimeLimits() const { return CurrentProfile.cognitive.disable_time_limits; }
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|Cognitive")
+	FString GetTutorialReminders() const { return CurrentProfile.cognitive.tutorial_reminders; }
 
 	UFUNCTION(BlueprintCallable, Category = "AnyUser|Interceptors")
 	void ApplyDropInInterceptors();
