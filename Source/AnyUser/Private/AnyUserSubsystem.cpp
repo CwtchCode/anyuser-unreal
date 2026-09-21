@@ -16,12 +16,28 @@ void UAnyUserSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UAnyUserSubsystem::AutoDiscoverProfile()
 {
-	const TArray<FString> CandidatePaths = {
+	TArray<FString> CandidatePaths = {
+		// 1. Standard Global OS Documents Path: Documents/AnyUser/profile.anyuser
+		FPaths::Combine(FPlatformProcess::UserDir(), TEXT("AnyUser"), TEXT("profile.anyuser")),
+		FPaths::Combine(FPlatformProcess::UserDir(), TEXT("Documents"), TEXT("AnyUser"), TEXT("profile.anyuser")),
+		// 2. Project local and saved paths
 		FPaths::ProjectSavedDir() / TEXT("profile.anyuser"),
 		FPaths::ProjectContentDir() / TEXT("profile.anyuser"),
 		FPaths::ProjectDir() / TEXT("profile.anyuser"),
 		FPaths::ProjectContentDir() / TEXT("AnyUser") / TEXT("profile.anyuser")
 	};
+
+	// Also check environment variables for Windows (%USERPROFILE%) and Linux/macOS ($HOME)
+	const FString UserProfileEnv = FPlatformMisc::GetEnvironmentVariable(TEXT("USERPROFILE"));
+	if (!UserProfileEnv.IsEmpty())
+	{
+		CandidatePaths.Add(UserProfileEnv / TEXT("Documents") / TEXT("AnyUser") / TEXT("profile.anyuser"));
+	}
+	const FString HomeEnv = FPlatformMisc::GetEnvironmentVariable(TEXT("HOME"));
+	if (!HomeEnv.IsEmpty())
+	{
+		CandidatePaths.Add(HomeEnv / TEXT("Documents") / TEXT("AnyUser") / TEXT("profile.anyuser"));
+	}
 
 	bool bLoaded = false;
 	for (const FString& Path : CandidatePaths)
@@ -39,7 +55,7 @@ void UAnyUserSubsystem::AutoDiscoverProfile()
 
 	if (!bLoaded)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[AnyUser] No local profile.anyuser found. Operating on standard accessibility defaults."));
+		UE_LOG(LogTemp, Log, TEXT("[AnyUser] No local or global profile.anyuser found. Operating on standard accessibility defaults."));
 		ApplyDropInInterceptors();
 	}
 }
@@ -86,6 +102,11 @@ bool UAnyUserSubsystem::LoadProfileFromJson(const FString& JsonString)
 
 void UAnyUserSubsystem::ApplyDropInInterceptors()
 {
+	if (!bIsEnabled)
+	{
+		return;
+	}
+
 	// Drop-In Interceptor: Automatic global Slate & UMG UI scaling
 	if (CurrentProfile.vision.ui_scale > 0.0f)
 	{
@@ -96,3 +117,30 @@ void UAnyUserSubsystem::ApplyDropInInterceptors()
 		}
 	}
 }
+
+void UAnyUserSubsystem::SetEnabled(bool bActive)
+{
+	bIsEnabled = bActive;
+	if (bIsEnabled)
+	{
+		ApplyDropInInterceptors();
+		UE_LOG(LogTemp, Log, TEXT("[AnyUser] Profile enabled. Accessibility overrides applied."));
+	}
+	else
+	{
+		// Revert drop-in interceptors to vanilla defaults
+		if (UUserInterfaceSettings* UISettings = GetMutableDefault<UUserInterfaceSettings>())
+		{
+			UISettings->ApplicationScale = 1.0f;
+		}
+		UE_LOG(LogTemp, Log, TEXT("[AnyUser] Profile disabled. Reverted to vanilla game defaults."));
+	}
+	OnProfileChanged.Broadcast(CurrentProfile);
+}
+
+bool UAnyUserSubsystem::ToggleEnabled()
+{
+	SetEnabled(!bIsEnabled);
+	return bIsEnabled;
+}
+

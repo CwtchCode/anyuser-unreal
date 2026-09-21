@@ -105,9 +105,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AnyUser|Interceptors")
 	void ApplyDropInInterceptors();
 
+	UFUNCTION(BlueprintCallable, Category = "AnyUser|State")
+	void SetEnabled(bool bActive);
+
+	UFUNCTION(BlueprintPure, Category = "AnyUser|State")
+	bool IsEnabled() const { return bIsEnabled; }
+
+	UFUNCTION(BlueprintCallable, Category = "AnyUser|State")
+	bool ToggleEnabled();
+
 private:
 	UPROPERTY()
 	FAnyUserProfile CurrentProfile;
+
+	UPROPERTY()
+	bool bIsEnabled = true;
 
 	void AutoDiscoverProfile();
 };
