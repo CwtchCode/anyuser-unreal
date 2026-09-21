@@ -1,9 +1,0 @@
-﻿Binaries/
-Intermediate/
-DerivedDataCache/
-Saved/
-.vs/
-.idea/
-*.sln
-.DS_Store
-Thumbs.db

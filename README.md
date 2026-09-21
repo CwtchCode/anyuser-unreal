@@ -27,11 +27,19 @@ Eliminate "Configuration Fatigue" by configuring screen shake dampening, hold-vs
 
 ---
 
+---
+
+## ⚡ Zero-Code Drop-In Features (No Code Changes Needed!)
+`UAnyUserSubsystem` automatically initializes with your `GameInstance` on boot:
+* **Global Slate & UMG Auto-Scaling**: Automatically sets `UUserInterfaceSettings::ApplicationScale = profile.vision.ui_scale`, resizing all menus, HUDs, and UMG widgets across the entire game immediately.
+* **Multi-Path Discovery**: Automatically searches `ProjectSavedDir()`, `ProjectContentDir()`, `ProjectDir()`, and `Content/AnyUser/` for `profile.anyuser`.
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### 1. Ingestion Subsystem (`UAnyUserSubsystem`)
 `UAnyUserSubsystem` is a `UGameInstanceSubsystem` that automatically runs on boot and persists across all level transitions:
-- Automatically looks for `Saved/profile.anyuser` or `Content/profile.anyuser`.
 - Accessible in C++ via:
   ```cpp
   UAnyUserSubsystem* AnyUser = GetGameInstance()->GetSubsystem<UAnyUserSubsystem>();

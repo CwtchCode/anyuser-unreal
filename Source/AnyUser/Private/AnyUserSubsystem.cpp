@@ -2,6 +2,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "JsonObjectConverter.h"
+#include "Engine/UserInterfaceSettings.h"
 
 void UAnyUserSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -15,20 +16,31 @@ void UAnyUserSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UAnyUserSubsystem::AutoDiscoverProfile()
 {
-	const FString SavedPath = FPaths::ProjectSavedDir() / TEXT("profile.anyuser");
-	const FString ContentPath = FPaths::ProjectContentDir() / TEXT("profile.anyuser");
+	const TArray<FString> CandidatePaths = {
+		FPaths::ProjectSavedDir() / TEXT("profile.anyuser"),
+		FPaths::ProjectContentDir() / TEXT("profile.anyuser"),
+		FPaths::ProjectDir() / TEXT("profile.anyuser"),
+		FPaths::ProjectContentDir() / TEXT("AnyUser") / TEXT("profile.anyuser")
+	};
 
-	if (FPaths::FileExists(SavedPath))
+	bool bLoaded = false;
+	for (const FString& Path : CandidatePaths)
 	{
-		LoadProfileFromFile(SavedPath);
+		if (FPaths::FileExists(Path))
+		{
+			UE_LOG(LogTemp, Log, TEXT("[AnyUser] Discovered profile at: %s"), *Path);
+			bLoaded = LoadProfileFromFile(Path);
+			if (bLoaded)
+			{
+				break;
+			}
+		}
 	}
-	else if (FPaths::FileExists(ContentPath))
-	{
-		LoadProfileFromFile(ContentPath);
-	}
-	else
+
+	if (!bLoaded)
 	{
 		UE_LOG(LogTemp, Log, TEXT("[AnyUser] No local profile.anyuser found. Operating on standard accessibility defaults."));
+		ApplyDropInInterceptors();
 	}
 }
 
@@ -64,9 +76,23 @@ bool UAnyUserSubsystem::LoadProfileFromJson(const FString& JsonString)
 			CurrentProfile.vision.screen_shake,
 			CurrentProfile.motor.aim_assist_strength);
 
+		ApplyDropInInterceptors();
 		return true;
 	}
 
 	UE_LOG(LogTemp, Error, TEXT("[AnyUser] Failed to parse profile JSON against AnyUser schema."));
 	return false;
+}
+
+void UAnyUserSubsystem::ApplyDropInInterceptors()
+{
+	// Drop-In Interceptor: Automatic global Slate & UMG UI scaling
+	if (CurrentProfile.vision.ui_scale > 0.0f)
+	{
+		if (UUserInterfaceSettings* UISettings = GetMutableDefault<UUserInterfaceSettings>())
+		{
+			UISettings->ApplicationScale = CurrentProfile.vision.ui_scale;
+			UE_LOG(LogTemp, Log, TEXT("[AnyUser] Drop-In Interceptor: Applied global UI ApplicationScale = %.2f"), CurrentProfile.vision.ui_scale);
+		}
+	}
 }

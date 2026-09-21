@@ -69,6 +69,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AnyUser|Cognitive")
 	bool IsDisableTimeLimits() const { return CurrentProfile.cognitive.disable_time_limits; }
 
+	UFUNCTION(BlueprintCallable, Category = "AnyUser|Interceptors")
+	void ApplyDropInInterceptors();
+
 private:
 	UPROPERTY()
 	FAnyUserProfile CurrentProfile;
